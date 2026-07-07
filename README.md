@@ -1,12 +1,12 @@
 # Quality Food Fluids
 
-Quality Food Fluids is a Forge 1.20.1 addon for Quality Food and Create. It lets fluids carry Quality Food quality, then keeps that quality through containers, world fluid blocks, Create fluid logistics, and common food-processing machines.
+Quality Food Fluids is a Forge 1.20.1 addon for Quality Food. It lets fluids carry Quality Food quality, then keeps that quality through containers, world fluid blocks, and optional food-processing machine integrations.
 
 ## Features
 
 - Stores quality on `FluidStack` NBT and on placed source fluids through per-dimension saved data.
 - Transfers quality between buckets/fluid containers and fluids when filling or emptying.
-- Supports Create drains, spouts, basins, tanks, hose pulleys, open-ended pipes, deployers, and sequenced assembly.
+- Supports Create drains, spouts, basins, tanks, hose pulleys, open-ended pipes, deployers, and sequenced assembly when Create is installed.
 - Lets qualified item and fluid inputs both affect qualified item and fluid outputs.
 - Locks processing quality when a machine run starts, so blocked outputs cannot be used to reroll quality.
 - Shows quality information in Jade and JEI when those mods are installed.
@@ -27,10 +27,10 @@ Required:
 - Minecraft 1.20.1
 - Forge 47+
 - Quality Food 2.3.0+
-- Create 6.0.8+
 
 Optional:
 
+- Create 6.0.8+
 - Jade
 - JEI
 - Brewin' And Chewin'

@@ -21,19 +21,44 @@ public class QualityFoodFluidsMixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.endsWith("BrewinKegBlockEntityMixin")) {
-            return LoadingModList.get().getModFileById("brewinandchewin") != null;
+            return isLoaded("brewinandchewin");
         }
 
         if (mixinClassName.endsWith("CreatedieselBulkFermenterBlockEntityMixin")
                 || mixinClassName.endsWith("CreatedieselBulkFermentingRecipeMixin")) {
-            return LoadingModList.get().getModFileById("createdieselgenerators") != null;
+            return isLoaded("create") && isLoaded("createdieselgenerators");
         }
 
         if (mixinClassName.endsWith("FarmersRespiteKettleBlockEntityMixin")) {
-            return LoadingModList.get().getModFileById("farmersrespite") != null;
+            return isLoaded("farmersrespite");
+        }
+
+        if (isCreateMixin(mixinClassName)) {
+            return isLoaded("create");
         }
 
         return true;
+    }
+
+    private static boolean isLoaded(String modId) {
+        return LoadingModList.get().getModFileById(modId) != null;
+    }
+
+    private static boolean isCreateMixin(String mixinClassName) {
+        return mixinClassName.endsWith("BasinBlockEntityMixin")
+                || mixinClassName.endsWith("BasinOperatingBlockEntityMixin")
+                || mixinClassName.endsWith("BasinRecipeMixin")
+                || mixinClassName.endsWith("BeltDeployerCallbacksMixin")
+                || mixinClassName.endsWith("DeployerHandlerMixin")
+                || mixinClassName.endsWith("FillingBySpoutMixin")
+                || mixinClassName.endsWith("FluidDrainingBehaviourMixin")
+                || mixinClassName.endsWith("FluidFillingBehaviourMixin")
+                || mixinClassName.endsWith("FluidHelperMixin")
+                || mixinClassName.endsWith("GenericItemEmptyingMixin")
+                || mixinClassName.endsWith("HosePulleyFluidHandlerMixin")
+                || mixinClassName.endsWith("OpenEndedPipeMixin")
+                || mixinClassName.endsWith("RecipeApplierMixin")
+                || mixinClassName.endsWith("SequencedAssemblyRecipeMixin");
     }
 
     @Override
