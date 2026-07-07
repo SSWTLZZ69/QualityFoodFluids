@@ -1,0 +1,33 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.createdelight.qualityfoodfluids.mixin",
+  "plugin": "io.github.createdelight.qualityfoodfluids.mixin.QualityFoodFluidsMixinPlugin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "quality_food_fluids.refmap.json",
+  "mixins": [
+    "BucketItemMixin",
+    "BasinBlockEntityMixin",
+    "BasinOperatingBlockEntityMixin",
+    "BasinRecipeMixin",
+    "BeltDeployerCallbacksMixin",
+    "BrewinKegBlockEntityMixin",
+    "CreatedieselBulkFermenterBlockEntityMixin",
+    "CreatedieselBulkFermentingRecipeMixin",
+    "DeployerHandlerMixin",
+    "FarmersRespiteKettleBlockEntityMixin",
+    "FillingBySpoutMixin",
+    "FluidDrainingBehaviourMixin",
+    "FluidFillingBehaviourMixin",
+    "FluidHelperMixin",
+    "GenericItemEmptyingMixin",
+    "HosePulleyFluidHandlerMixin",
+    "LiquidBlockMixin",
+    "OpenEndedPipeMixin",
+    "RecipeApplierMixin",
+    "SequencedAssemblyRecipeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

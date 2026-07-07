@@ -1,0 +1,6 @@
+{
+  "modmenu.nameTranslation.quality_food_fluids": "Quality Food Fluids",
+  "tooltip.quality_food_fluids.fluid_quality": "Fluid Quality: ",
+  "tooltip.quality_food_fluids.storage_fluid_quality": "%s Quality: %s",
+  "jei.info.quality_food_fluids.quality_fluid": "This fluid can carry Quality Food quality. The actual quality is stored on the fluid stack, its container item, or the placed world fluid, and basin processing rolls and locks it when processing starts."
+}

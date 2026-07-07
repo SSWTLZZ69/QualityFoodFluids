@@ -1,0 +1,6 @@
+{
+  "modmenu.nameTranslation.quality_food_fluids": "Quality Food 流体品质",
+  "tooltip.quality_food_fluids.fluid_quality": "流体品质：",
+  "tooltip.quality_food_fluids.storage_fluid_quality": "%s 品质：%s",
+  "jei.info.quality_food_fluids.quality_fluid": "这种流体可以携带 Quality Food 品质。实际品质会保存在流体栈、容器物品或世界中的流体方块上；工作盆加工会在开工时随机并锁定本次品质结果。"
+}
