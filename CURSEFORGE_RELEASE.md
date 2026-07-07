@@ -1,6 +1,13 @@
-# Quality Food Fluids 0.1.0
+# Quality Food Fluids 0.1.2
 
 Quality Food Fluids is a Forge 1.20.1 addon for Quality Food. It lets datapack-selected fluids carry Quality Food quality through containers, placed source blocks, and optional processing-machine integrations.
+
+## 0.1.2 Fixes
+
+- Fixes Jade compatibility so normal fluid container displays remain visible.
+- Fixes duplicate JEI subtype registration errors.
+- Fixes Brewin' And Chewin' keg and Farmer's Respite kettle item-pouring quality transfer.
+- Fixes keg and kettle produced fluids receiving their rolled quality too late.
 
 ## Highlights
 

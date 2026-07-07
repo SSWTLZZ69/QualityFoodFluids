@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import umpaz.farmersrespite.common.block.entity.KettleBlockEntity;
 import umpaz.farmersrespite.common.crafting.KettlePouringRecipe;
@@ -75,15 +76,20 @@ public abstract class FarmersRespiteKettleBlockEntityMixin {
         qualityFoodFluids$brewingQuality = QualityFoodFluidsCreateRules.rollBasinQuality(consumedItems, consumedFluids);
     }
 
+    @ModifyArg(
+            method = "processBrewing",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;setFluid(Lnet/minecraftforge/fluids/FluidStack;)V"),
+            index = 0
+    )
+    private FluidStack qualityFoodFluids$applyBrewingFluidOutputQuality(FluidStack stack) {
+        return qualityFoodFluids$brewingQuality == null
+                ? stack
+                : QualityFoodFluidsCreateRules.applyFluidOutputQuality(qualityFoodFluids$brewingQuality, stack);
+    }
+
     @Inject(method = "processBrewing", at = @At("RETURN"))
-    private void qualityFoodFluids$applyBrewingFluidQuality(KettleRecipe recipe, KettleBlockEntity kettle, CallbackInfoReturnable<Boolean> callback) {
-        try {
-            if (Boolean.TRUE.equals(callback.getReturnValue()) && qualityFoodFluids$brewingQuality != null) {
-                fluidTank.setFluid(QualityFoodFluidsCreateRules.applyFluidOutputQuality(qualityFoodFluids$brewingQuality, fluidTank.getFluid()));
-            }
-        } finally {
-            qualityFoodFluids$brewingQuality = null;
-        }
+    private void qualityFoodFluids$clearBrewingQuality(KettleRecipe recipe, KettleBlockEntity kettle, CallbackInfoReturnable<Boolean> callback) {
+        qualityFoodFluids$brewingQuality = null;
     }
 
     @Inject(method = "fluidExtract", at = @At("HEAD"))
@@ -96,6 +102,15 @@ public abstract class FarmersRespiteKettleBlockEntityMixin {
         if (recipe.isPresent() && input.is(recipe.get().getContainer().getItem())) {
             qualityFoodFluids$pouringOutput = recipe.get().getOutput().copy();
         }
+    }
+
+    @ModifyArg(
+            method = "fluidExtract",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;fill(Lnet/minecraftforge/fluids/FluidStack;Lnet/minecraftforge/fluids/capability/IFluidHandler$FluidAction;)I"),
+            index = 0
+    )
+    private FluidStack qualityFoodFluids$applyContainerQualityToFilledFluid(FluidStack stack) {
+        return QualityFoodFluidsApi.copyContainerQualityToFluid(qualityFoodFluids$extractSourceBefore, stack);
     }
 
     @Inject(method = "fluidExtract", at = @At("RETURN"), cancellable = true)

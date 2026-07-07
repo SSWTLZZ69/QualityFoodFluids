@@ -86,15 +86,20 @@ public abstract class BrewinKegBlockEntityMixin {
                 : QualityFoodFluidsCreateRules.applyItemOutputQuality(qualityFoodFluids$fermentingQuality, stack);
     }
 
+    @ModifyArg(
+            method = "processFermenting",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;setFluid(Lnet/minecraftforge/fluids/FluidStack;)V"),
+            index = 0
+    )
+    private FluidStack qualityFoodFluids$applyFermentingFluidOutputQuality(FluidStack stack) {
+        return qualityFoodFluids$fermentingQuality == null
+                ? stack
+                : QualityFoodFluidsCreateRules.applyFluidOutputQuality(qualityFoodFluids$fermentingQuality, stack);
+    }
+
     @Inject(method = "processFermenting", at = @At("RETURN"))
-    private void qualityFoodFluids$applyFermentingFluidQuality(KegFermentingRecipe recipe, KegBlockEntity keg, CallbackInfoReturnable<Boolean> callback) {
-        try {
-            if (Boolean.TRUE.equals(callback.getReturnValue()) && qualityFoodFluids$fermentingQuality != null && recipe.getResultFluid() != null) {
-                fluidTank.setFluid(QualityFoodFluidsCreateRules.applyFluidOutputQuality(qualityFoodFluids$fermentingQuality, fluidTank.getFluid()));
-            }
-        } finally {
-            qualityFoodFluids$fermentingQuality = null;
-        }
+    private void qualityFoodFluids$clearFermentingQuality(KegFermentingRecipe recipe, KegBlockEntity keg, CallbackInfoReturnable<Boolean> callback) {
+        qualityFoodFluids$fermentingQuality = null;
     }
 
     @Inject(method = "fluidExtract", at = @At("HEAD"))
@@ -107,6 +112,15 @@ public abstract class BrewinKegBlockEntityMixin {
         if (recipe.isPresent() && ItemStack.isSameItemSameTags(stack, recipe.get().getContainer())) {
             qualityFoodFluids$pouringOutput = recipe.get().getOutput().copy();
         }
+    }
+
+    @ModifyArg(
+            method = "fluidExtract",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;fill(Lnet/minecraftforge/fluids/FluidStack;Lnet/minecraftforge/fluids/capability/IFluidHandler$FluidAction;)I"),
+            index = 0
+    )
+    private FluidStack qualityFoodFluids$applyContainerQualityToFilledFluid(FluidStack stack) {
+        return QualityFoodFluidsApi.copyContainerQualityToFluid(qualityFoodFluids$extractSourceBefore, stack);
     }
 
     @Inject(method = "fluidExtract", at = @At("RETURN"), cancellable = true)

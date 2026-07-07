@@ -41,7 +41,11 @@ public class QualityFoodFluidsJeiPlugin implements IModPlugin {
             ItemStack stack = item.getDefaultInstance();
 
             if (item instanceof BucketItem || stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
-                registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, this::itemSubtype);
+                try {
+                    registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, this::itemSubtype);
+                } catch (IllegalArgumentException ignored) {
+                    // Another JEI plugin already handles this item subtype.
+                }
             }
         }
     }
@@ -49,7 +53,15 @@ public class QualityFoodFluidsJeiPlugin implements IModPlugin {
     @Override
     public <T> void registerFluidSubtypes(ISubtypeRegistration registration, IPlatformFluidHelper<T> platformFluidHelper) {
         for (Fluid fluid : ForgeRegistries.FLUIDS) {
-            registration.registerSubtypeInterpreter(ForgeTypes.FLUID_STACK, fluid, this::fluidSubtype);
+            if (!QualityFoodFluidsApi.canCarryQuality(new FluidStack(fluid, 1000))) {
+                continue;
+            }
+
+            try {
+                registration.registerSubtypeInterpreter(ForgeTypes.FLUID_STACK, fluid, this::fluidSubtype);
+            } catch (IllegalArgumentException ignored) {
+                // Another JEI plugin already handles this fluid subtype.
+            }
         }
     }
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.2 - 2026-07-08
+
+- Fixed Jade compatibility so Quality Food Fluids no longer reads Jade's internal fluid-storage payload and does not suppress the normal fluid container display.
+- Fixed duplicate JEI subtype registrations when other plugins already handle the same item or fluid.
+- Fixed Brewin' And Chewin' keg and Farmer's Respite kettle item-pouring paths so quality from pourable containers is copied into stored fluids.
+- Applied keg and kettle produced-fluid quality at the output `FluidStack` creation point.
+
+## 0.1.1 - 2026-07-08
+
+- Fixed optional dependency version ranges for mods that do not use semantic versions.
+- Kept Create as an optional dependency.
+
 ## 0.1.0 - 2026-07-07
 
 Initial release for Minecraft 1.20.1 Forge.

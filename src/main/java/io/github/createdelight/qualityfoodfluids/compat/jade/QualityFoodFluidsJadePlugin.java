@@ -6,31 +6,38 @@ import io.github.createdelight.qualityfoodfluids.api.QualityFoodFluidsApi;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.IWailaClientRegistration;
+import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.WailaPlugin;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.view.ViewGroup;
-
-import java.util.List;
-import java.util.function.Function;
 
 @WailaPlugin(QualityFoodFluids.MODID)
 public class QualityFoodFluidsJadePlugin implements IWailaPlugin {
-    private static final String JADE_FLUID_STORAGE = "JadeFluidStorage";
+    private static final String QUALITY_FLUID_STORAGE = "QualityFoodFluidsFluidStorage";
     private static final ResourceLocation WORLD_FLUID_QUALITY = new ResourceLocation(QualityFoodFluids.MODID, "world_fluid_quality");
     private static final ResourceLocation FLUID_STORAGE_QUALITY = new ResourceLocation(QualityFoodFluids.MODID, "fluid_storage_quality");
+
+    @Override
+    public void register(IWailaCommonRegistration registration) {
+        registration.registerBlockDataProvider(FluidStorageQualityServerProvider.INSTANCE, BlockEntity.class);
+    }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
@@ -72,6 +79,53 @@ public class QualityFoodFluidsJadePlugin implements IWailaPlugin {
         }
     }
 
+    private enum FluidStorageQualityServerProvider implements IServerDataProvider<BlockAccessor> {
+        INSTANCE;
+
+        @Override
+        public void appendServerData(CompoundTag data, BlockAccessor accessor) {
+            BlockEntity blockEntity = accessor.getBlockEntity();
+            if (blockEntity == null) {
+                return;
+            }
+
+            IFluidHandler handler = blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
+            if (handler == null) {
+                return;
+            }
+
+            ListTag fluids = new ListTag();
+            for (int tank = 0; tank < handler.getTanks(); tank++) {
+                FluidStack stack = handler.getFluidInTank(tank);
+                Quality quality = QualityFoodFluidsApi.getQuality(stack);
+
+                if (stack.isEmpty() || quality.level() <= 0) {
+                    continue;
+                }
+
+                ResourceLocation fluidId = BuiltInRegistries.FLUID.getKey(stack.getFluid());
+                if (fluidId == null) {
+                    continue;
+                }
+
+                CompoundTag fluidData = new CompoundTag();
+                fluidData.putString("fluid", fluidId.toString());
+                fluidData.putInt("amount", stack.getAmount());
+                fluidData.putInt("quality", quality.level());
+                fluids.add(fluidData);
+            }
+
+            if (!fluids.isEmpty()) {
+                data.put(QUALITY_FLUID_STORAGE, fluids);
+            }
+        }
+
+        @Override
+        public ResourceLocation getUid() {
+            return FLUID_STORAGE_QUALITY;
+        }
+    }
+
     private enum FluidStorageQualityProvider implements IBlockComponentProvider {
         INSTANCE;
 
@@ -79,58 +133,39 @@ public class QualityFoodFluidsJadePlugin implements IWailaPlugin {
         public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
             CompoundTag serverData = accessor.getServerData();
 
-            if (!serverData.contains(JADE_FLUID_STORAGE, Tag.TAG_LIST)) {
+            if (!serverData.contains(QUALITY_FLUID_STORAGE, Tag.TAG_LIST)) {
                 return;
             }
 
-            List<ViewGroup<CompoundTag>> groups = ViewGroup.readList(serverData, JADE_FLUID_STORAGE, Function.identity());
-
-            if (groups == null || groups.isEmpty()) {
-                return;
-            }
-
-            for (ViewGroup<CompoundTag> group : groups) {
-                for (CompoundTag fluidData : group.views) {
-                    FluidStack stack = readFluidStack(fluidData);
-
-                    if (stack.isEmpty() || !QualityFoodFluidsApi.canCarryQuality(stack)) {
-                        continue;
-                    }
-
-                    Quality quality = QualityFoodFluidsApi.getQuality(stack);
-
-                    if (quality.level() <= 0) {
-                        continue;
-                    }
-
-                    Component fluidName = stack.getDisplayName();
-                    tooltip.add(Component.translatable("tooltip.quality_food_fluids.storage_fluid_quality", fluidName, quality.getTranslation())
-                            .withStyle(ChatFormatting.GRAY));
+            ListTag fluids = serverData.getList(QUALITY_FLUID_STORAGE, Tag.TAG_COMPOUND);
+            for (Tag tag : fluids) {
+                if (!(tag instanceof CompoundTag fluidData)) {
+                    continue;
                 }
+
+                FluidStack stack = readFluidStack(fluidData);
+                Quality quality = Quality.get(fluidData.getInt("quality"));
+
+                if (stack.isEmpty() || quality.level() <= 0) {
+                    continue;
+                }
+
+                Component fluidName = stack.getDisplayName();
+                tooltip.add(Component.translatable("tooltip.quality_food_fluids.storage_fluid_quality", fluidName, quality.getTranslation())
+                        .withStyle(ChatFormatting.GRAY));
             }
         }
 
         private static FluidStack readFluidStack(CompoundTag fluidData) {
             ResourceLocation fluidId = ResourceLocation.tryParse(fluidData.getString("fluid"));
-
             if (fluidId == null || !BuiltInRegistries.FLUID.containsKey(fluidId)) {
                 return FluidStack.EMPTY;
             }
 
             Fluid fluid = BuiltInRegistries.FLUID.get(fluidId);
+            int amount = Math.max(1, fluidData.getInt("amount"));
 
-            if (fluid == Fluids.EMPTY) {
-                return FluidStack.EMPTY;
-            }
-
-            int amount = (int) Math.min(Integer.MAX_VALUE, Math.max(0L, fluidData.getLong("amount")));
-            FluidStack stack = new FluidStack(fluid, amount);
-
-            if (fluidData.contains("tag", Tag.TAG_COMPOUND)) {
-                stack.setTag(fluidData.getCompound("tag"));
-            }
-
-            return stack;
+            return fluid == Fluids.EMPTY ? FluidStack.EMPTY : new FluidStack(fluid, amount);
         }
 
         @Override
