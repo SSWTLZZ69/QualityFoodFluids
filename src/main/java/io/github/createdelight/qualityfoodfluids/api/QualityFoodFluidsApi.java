@@ -35,6 +35,18 @@ public final class QualityFoodFluidsApi {
         return getQuality(stack).level() > 0;
     }
 
+    public static FluidStack stripQualityForComparison(FluidStack stack) {
+        return clearQuality(stack);
+    }
+
+    public static boolean isFluidEqualIgnoringQuality(FluidStack left, FluidStack right) {
+        if (left == null || right == null) {
+            return false;
+        }
+
+        return stripQualityForComparison(left).isFluidEqual(stripQualityForComparison(right));
+    }
+
     public static FluidStack withQuality(FluidStack stack, Quality quality) {
         FluidStack copy = stack.copy();
 

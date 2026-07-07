@@ -52,6 +52,33 @@ public abstract class FarmersRespiteKettleBlockEntityMixin {
     @Unique
     private ItemStack qualityFoodFluids$pouringOutput = ItemStack.EMPTY;
 
+    @ModifyArg(
+            method = "getMatchingRecipe",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/FluidStack;isFluidEqual(Lnet/minecraftforge/fluids/FluidStack;)Z"),
+            index = 0
+    )
+    private FluidStack qualityFoodFluids$ignoreQualityInCachedRecipeMatch(FluidStack stack) {
+        return QualityFoodFluidsApi.stripQualityForComparison(stack);
+    }
+
+    @ModifyArg(
+            method = "canBrew",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/FluidStack;areFluidStackTagsEqual(Lnet/minecraftforge/fluids/FluidStack;Lnet/minecraftforge/fluids/FluidStack;)Z"),
+            index = 0
+    )
+    private FluidStack qualityFoodFluids$ignoreQualityInInputTagCheck(FluidStack stack) {
+        return QualityFoodFluidsApi.stripQualityForComparison(stack);
+    }
+
+    @ModifyArg(
+            method = "canBrew",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/FluidStack;areFluidStackTagsEqual(Lnet/minecraftforge/fluids/FluidStack;Lnet/minecraftforge/fluids/FluidStack;)Z"),
+            index = 1
+    )
+    private FluidStack qualityFoodFluids$ignoreQualityInOutputTagCheck(FluidStack stack) {
+        return QualityFoodFluidsApi.stripQualityForComparison(stack);
+    }
+
     @Inject(method = "processBrewing", at = @At("HEAD"))
     private void qualityFoodFluids$captureBrewingQuality(KettleRecipe recipe, KettleBlockEntity kettle, CallbackInfoReturnable<Boolean> callback) {
         qualityFoodFluids$brewingQuality = null;

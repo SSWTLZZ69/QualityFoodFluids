@@ -51,6 +51,24 @@ public abstract class BrewinKegBlockEntityMixin {
     @Unique
     private ItemStack qualityFoodFluids$pouringOutput = ItemStack.EMPTY;
 
+    @ModifyArg(
+            method = "lambda$getMatchingRecipe$4",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/FluidStack;isFluidEqual(Lnet/minecraftforge/fluids/FluidStack;)Z"),
+            index = 0
+    )
+    private FluidStack qualityFoodFluids$ignoreQualityInRecipeMatch(FluidStack stack) {
+        return QualityFoodFluidsApi.stripQualityForComparison(stack);
+    }
+
+    @ModifyArg(
+            method = "lambda$getPouringRecipe$7",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fluids/FluidStack;isFluidEqual(Lnet/minecraftforge/fluids/FluidStack;)Z"),
+            index = 0
+    )
+    private FluidStack qualityFoodFluids$ignoreQualityInPouringRecipeMatch(FluidStack stack) {
+        return QualityFoodFluidsApi.stripQualityForComparison(stack);
+    }
+
     @Inject(method = "processFermenting", at = @At("HEAD"))
     private void qualityFoodFluids$captureFermentingQuality(KegFermentingRecipe recipe, KegBlockEntity keg, CallbackInfoReturnable<Boolean> callback) {
         qualityFoodFluids$fermentingQuality = null;

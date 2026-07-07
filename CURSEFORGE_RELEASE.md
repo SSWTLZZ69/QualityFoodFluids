@@ -8,6 +8,7 @@ Quality Food Fluids is a Forge 1.20.1 addon for Quality Food. It lets datapack-s
 - Fixes duplicate JEI subtype registration errors.
 - Fixes Brewin' And Chewin' keg and Farmer's Respite kettle item-pouring quality transfer.
 - Fixes keg and kettle produced fluids receiving their rolled quality too late.
+- Fixes keg and kettle recipes failing to match when their stored input fluid has QFF quality NBT.
 
 ## Highlights
 

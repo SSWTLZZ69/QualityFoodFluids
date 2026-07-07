@@ -11,6 +11,7 @@
     "BasinOperatingBlockEntityMixin",
     "BasinRecipeMixin",
     "BeltDeployerCallbacksMixin",
+    "BrewinKegFermentingRecipeMixin",
     "BrewinKegBlockEntityMixin",
     "CreatedieselBulkFermenterBlockEntityMixin",
     "CreatedieselBulkFermentingRecipeMixin",

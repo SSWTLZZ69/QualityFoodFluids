@@ -6,6 +6,7 @@
 - Fixed duplicate JEI subtype registrations when other plugins already handle the same item or fluid.
 - Fixed Brewin' And Chewin' keg and Farmer's Respite kettle item-pouring paths so quality from pourable containers is copied into stored fluids.
 - Applied keg and kettle produced-fluid quality at the output `FluidStack` creation point.
+- Fixed Brewin' And Chewin' keg and Farmer's Respite kettle recipe checks so QFF quality NBT does not prevent matching.
 
 ## 0.1.1 - 2026-07-08
 
