@@ -121,7 +121,7 @@ public abstract class BrewinKegBlockEntityMixin {
     }
 
     @Inject(method = "fluidExtract", at = @At("HEAD"))
-    private void qualityFoodFluids$captureFluidExtract(ItemStack stack, int servings, boolean simulate, boolean forceStack, CallbackInfoReturnable<List<ItemStack>> callback) {
+    private void qualityFoodFluids$captureFluidExtract(ItemStack stack, int servings, boolean inGui, boolean forceStack, CallbackInfoReturnable<List<ItemStack>> callback) {
         qualityFoodFluids$extractFluidBefore = fluidTank.getFluid().copy();
         qualityFoodFluids$extractSourceBefore = stack.copy();
         qualityFoodFluids$pouringOutput = ItemStack.EMPTY;
@@ -142,12 +142,8 @@ public abstract class BrewinKegBlockEntityMixin {
     }
 
     @Inject(method = "fluidExtract", at = @At("RETURN"), cancellable = true)
-    private void qualityFoodFluids$applyFluidExtractQuality(ItemStack stack, int servings, boolean simulate, boolean forceStack, CallbackInfoReturnable<List<ItemStack>> callback) {
+    private void qualityFoodFluids$applyFluidExtractQuality(ItemStack stack, int servings, boolean inGui, boolean forceStack, CallbackInfoReturnable<List<ItemStack>> callback) {
         try {
-            if (simulate) {
-                return;
-            }
-
             FluidStack current = fluidTank.getFluid();
             int beforeAmount = qualityFoodFluids$extractFluidBefore.getAmount();
             int currentAmount = current.getAmount();
