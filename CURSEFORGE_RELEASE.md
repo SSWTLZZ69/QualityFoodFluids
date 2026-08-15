@@ -1,14 +1,14 @@
-# Quality Food Fluids 0.1.2
+# Quality Food Fluids 0.1.4
 
 Quality Food Fluids is a Forge 1.20.1 addon for Quality Food. It lets datapack-selected fluids carry Quality Food quality through containers, placed source blocks, and optional processing-machine integrations.
 
-## 0.1.2 Fixes
+## 0.1.4 Changes
 
-- Fixes Jade compatibility so normal fluid container displays remain visible.
-- Fixes duplicate JEI subtype registration errors.
-- Fixes Brewin' And Chewin' keg and Farmer's Respite kettle item-pouring quality transfer.
-- Fixes keg and kettle produced fluids receiving their rolled quality too late.
-- Fixes keg and kettle recipes failing to match when their stored input fluid has QFF quality NBT.
+- Ordinary drinkable items can now receive Quality Food quality automatically without a material-whitelist entry.
+- Potion items remain excluded from automatic quality eligibility.
+- Buckets and fluid containers become quality-capable automatically when they contain a fluid supported by Quality Food Fluids.
+- The existing Quality Food blacklist remains authoritative.
+- Fixes the bundled milk fluid tag when running without a registered milk fluid.
 
 ## Highlights
 
@@ -19,6 +19,7 @@ Quality Food Fluids is a Forge 1.20.1 addon for Quality Food. It lets datapack-s
 - Machine runs lock their quality result when processing starts, preventing blocked-output reroll exploits.
 - Jade and JEI integration are included when those mods are installed.
 - Optional compat is included for Brewin' And Chewin', Farmer's Respite, and Create Diesel Generators bulk fermenting.
+- Common food and drink fluids are included by default and can still be extended or overridden with datapack tags.
 
 ## Required Dependencies
 
@@ -36,4 +37,4 @@ Quality Food Fluids is a Forge 1.20.1 addon for Quality Food. It lets datapack-s
 
 ## Pack Configuration
 
-Add fluids to the `quality_food_fluids:quality_fluids` and `quality_food_fluids:world_quality_fluids` tags to decide which fluids in your pack can carry quality.
+Extend the `quality_food_fluids:quality_fluids` and `quality_food_fluids:world_quality_fluids` tags to support additional pack fluids. Use `quality_food_fluids:clear_quality_fluids` to force specific fluids to discard carried quality.

@@ -14,13 +14,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class FluidFillingBehaviourMixin {
     @Inject(
             method = "tryDeposit",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", shift = At.Shift.AFTER)
+            at = @At("RETURN")
     )
     private void qualityFoodFluids$storePlacedFluidQuality(Fluid fluid, BlockPos root, boolean simulate, CallbackInfoReturnable<Boolean> callback) {
-        if (!simulate) {
-            Level world = ((FluidFillingBehaviour) (Object) this).getWorld();
-            findNearbyPlacedSource(world, root, fluid);
+        if (simulate || !callback.getReturnValue()) {
+            return;
         }
+
+        Level world = ((FluidFillingBehaviour) (Object) this).getWorld();
+        findNearbyPlacedSource(world, root, fluid);
     }
 
     private void findNearbyPlacedSource(Level world, BlockPos root, Fluid fluid) {

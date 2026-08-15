@@ -6,6 +6,8 @@ Quality Food Fluids is a Forge 1.20.1 addon for Quality Food. It lets fluids car
 
 - Stores quality on `FluidStack` NBT and on placed source fluids through per-dimension saved data.
 - Transfers quality between buckets/fluid containers and fluids when filling or emptying.
+- Automatically lets ordinary drinkable items receive quality without a material-whitelist entry, while excluding potions and respecting the Quality Food blacklist.
+- Automatically lets buckets and fluid containers receive quality when they contain a quality-capable fluid.
 - Supports Create drains, spouts, basins, tanks, hose pulleys, open-ended pipes, deployers, and sequenced assembly when Create is installed.
 - Lets qualified item and fluid inputs both affect qualified item and fluid outputs.
 - Locks processing quality when a machine run starts, so blocked outputs cannot be used to reroll quality.
@@ -14,7 +16,7 @@ Quality Food Fluids is a Forge 1.20.1 addon for Quality Food. It lets fluids car
 
 ## Datapack Tags
 
-This mod does not decide which fluids in your pack should carry food quality. Add fluids to:
+The mod includes common food and drink fluids by default. Packs can extend or override support through:
 
 - `#quality_food_fluids:quality_fluids` for fluids that can store quality on a `FluidStack`.
 - `#quality_food_fluids:world_quality_fluids` for placeable fluids that should keep quality in the world.

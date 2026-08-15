@@ -6,7 +6,10 @@ import io.github.createdelight.qualityfoodfluids.registry.QualityFoodFluidTags;
 import io.github.createdelight.qualityfoodfluids.world.WorldFluidQualityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PotionItem;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -91,6 +94,39 @@ public final class QualityFoodFluidsApi {
         }
 
         return stack.getFluid().defaultFluidState().is(QualityFoodFluidTags.WORLD_QUALITY_FLUIDS);
+    }
+
+    public static boolean isAutomaticallyQualityCapableItem(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return false;
+        }
+
+        if (stack.getItem() instanceof PotionItem) {
+            return false;
+        }
+
+        if (stack.getUseAnimation() == UseAnim.DRINK) {
+            return true;
+        }
+
+        if (stack.getItem() instanceof BucketItem bucket
+                && canCarryQuality(new FluidStack(bucket.getFluid(), 1000))) {
+            return true;
+        }
+
+        IFluidHandlerItem handler = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve().orElse(null);
+
+        if (handler == null) {
+            return false;
+        }
+
+        for (int tank = 0; tank < handler.getTanks(); tank++) {
+            if (canCarryQuality(handler.getFluidInTank(tank))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static Quality getItemQuality(ItemStack stack) {
