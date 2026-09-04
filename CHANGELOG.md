@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Updated the Quality Food compatibility baseline to 2.4.3 and aligned Create basin quality handling with its 2.4 recipe changes.
+
 ## 0.1.4 - 2026-08-15
 
 - Made ordinary drinkable items automatically eligible for Quality Food quality without adding them to the material whitelist.

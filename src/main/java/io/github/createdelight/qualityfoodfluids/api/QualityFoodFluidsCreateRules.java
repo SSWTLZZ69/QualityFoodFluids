@@ -145,9 +145,8 @@ public final class QualityFoodFluidsCreateRules {
                 continue;
             }
 
-            double chance = sourceCount == 0
-                    ? QualityConfig.getChance(quality)
-                    : QualityConfig.calculateChance(quality, averageWeight);
+            double chance = QualityConfig.getChance(quality)
+                    + QualityConfig.calculateChance(quality, averageWeight);
 
             if (chance > 0 && chance >= RANDOM.nextDouble()) {
                 selected = quality;

@@ -4,7 +4,7 @@ import com.simibubi.create.content.processing.basin.BasinBlockEntity;
 import com.simibubi.create.content.processing.basin.BasinRecipe;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 import de.cadentem.quality_food.core.Quality;
-import de.cadentem.quality_food.util.Utils;
+import de.cadentem.quality_food.config.ServerConfig;
 import io.github.createdelight.qualityfoodfluids.api.QualityFoodFluidsApi;
 import io.github.createdelight.qualityfoodfluids.api.QualityFoodFluidsCreateRules;
 import net.minecraft.resources.ResourceLocation;
@@ -46,7 +46,8 @@ public final class BasinRecipeQualityContext {
     public static boolean applyToOutputs(BasinBlockEntity basin, List<ItemStack> outputItems, List<FluidStack> outputFluids, boolean simulate) {
         Context context = CURRENT.get();
 
-        if (context == null || context.basin != basin || !hasQualityCapableOutput(outputItems, outputFluids)) {
+        if (context == null || context.basin != basin
+                || (!hasQualityCapableOutput(outputFluids) && !hasQualityFluidSource(context.consumedFluids))) {
             return true;
         }
 
@@ -57,9 +58,12 @@ public final class BasinRecipeQualityContext {
             return false;
         }
 
-        QualityFoodFluidsCreateRules.applyBasinItemOutputQuality(ticket.quality(), outputItems);
+        if (hasQualityFluidSource(context.consumedFluids)
+                && !ServerConfig.isNoQualityRecipe(context.recipe, basin.getLevel())) {
+            QualityFoodFluidsCreateRules.applyBasinItemOutputQuality(ticket.quality(), outputItems);
+        }
 
-        if (!outputFluids.isEmpty()) {
+        if (hasQualityCapableOutput(outputFluids)) {
             replaceOutputs(outputFluids, ticket.copyOutputs());
         }
 
@@ -73,7 +77,7 @@ public final class BasinRecipeQualityContext {
             return;
         }
 
-        if (hasQualityCapableOutput(outputItems, outputFluids)) {
+        if (hasQualityCapableOutput(outputFluids) || hasQualityFluidSource(context.consumedFluids)) {
             clearTicket(basin);
         }
     }
@@ -83,10 +87,10 @@ public final class BasinRecipeQualityContext {
             return;
         }
 
-        List<ItemStack> itemOutputs = baseItemOutputs(recipe);
         List<FluidStack> fluidOutputs = baseFluidOutputs(recipe);
 
-        if (!hasQualityCapableOutput(itemOutputs, fluidOutputs)) {
+        List<FluidStack> consumedFluids = consumedFluids(recipe, fluidHandler(basin));
+        if (!hasQualityCapableOutput(fluidOutputs) && !hasQualityFluidSource(consumedFluids)) {
             clearTicket(basin);
             return;
         }
@@ -193,27 +197,9 @@ public final class BasinRecipeQualityContext {
         return outputs;
     }
 
-    private static List<ItemStack> baseItemOutputs(Recipe<?> recipe) {
-        List<ItemStack> outputs = new ArrayList<>();
-
-        if (recipe instanceof BasinRecipe basinRecipe) {
-            for (ItemStack stack : basinRecipe.getRollableResultsAsItemStacks()) {
-                if (!stack.isEmpty()) {
-                    outputs.add(stack.copy());
-                }
-            }
-        }
-
-        return outputs;
-    }
-
-    private static boolean hasQualityCapableOutput(List<ItemStack> outputItems, List<FluidStack> outputFluids) {
-        return hasQualityCapableItemOutput(outputItems) || hasQualityCapableOutput(outputFluids);
-    }
-
-    private static boolean hasQualityCapableItemOutput(List<ItemStack> outputItems) {
-        for (ItemStack stack : outputItems) {
-            if (!stack.isEmpty() && Utils.isValidItem(stack)) {
+    private static boolean hasQualityCapableOutput(List<FluidStack> outputFluids) {
+        for (FluidStack stack : outputFluids) {
+            if (QualityFoodFluidsApi.canCarryQuality(stack)) {
                 return true;
             }
         }
@@ -221,9 +207,9 @@ public final class BasinRecipeQualityContext {
         return false;
     }
 
-    private static boolean hasQualityCapableOutput(List<FluidStack> outputFluids) {
-        for (FluidStack stack : outputFluids) {
-            if (QualityFoodFluidsApi.canCarryQuality(stack)) {
+    private static boolean hasQualityFluidSource(List<FluidStack> consumedFluids) {
+        for (FluidStack stack : consumedFluids) {
+            if (QualityFoodFluidsApi.hasQuality(stack)) {
                 return true;
             }
         }

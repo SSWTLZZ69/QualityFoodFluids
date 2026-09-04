@@ -175,9 +175,7 @@ public final class QualityFoodFluidsApi {
             return clearItemQuality(copy);
         }
 
-        CompoundTag qualityTag = new CompoundTag();
-        qualityTag.putInt(QualityUtils.QUALITY_KEY, quality.level());
-        copy.getOrCreateTag().put(QualityUtils.QUALITY_TAG, qualityTag);
+        QualityUtils.applyQuality(copy, quality, true);
         return copy;
     }
 

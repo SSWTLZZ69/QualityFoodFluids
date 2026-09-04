@@ -28,7 +28,7 @@ Required:
 
 - Minecraft 1.20.1
 - Forge 47+
-- Quality Food 2.3.0+
+- Quality Food 2.4.3+
 
 Optional:
 
