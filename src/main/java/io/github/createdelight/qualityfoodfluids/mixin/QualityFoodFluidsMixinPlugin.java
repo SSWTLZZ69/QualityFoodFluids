@@ -33,6 +33,10 @@ public class QualityFoodFluidsMixinPlugin implements IMixinConfigPlugin {
             return isLoaded("farmersrespite");
         }
 
+        if (mixinClassName.endsWith("CopperBasinBlockEntityMixin")) {
+            return isLoaded("fluidlogistics") && isLoaded("create");
+        }
+
         if (isCreateMixin(mixinClassName)) {
             return isLoaded("create");
         }

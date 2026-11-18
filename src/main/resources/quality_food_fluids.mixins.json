@@ -10,6 +10,7 @@
     "BasinBlockEntityMixin",
     "BasinOperatingBlockEntityMixin",
     "BasinRecipeMixin",
+    "CopperBasinBlockEntityMixin",
     "BeltDeployerCallbacksMixin",
     "BrewinKegFermentingRecipeMixin",
     "BrewinKegBlockEntityMixin",
