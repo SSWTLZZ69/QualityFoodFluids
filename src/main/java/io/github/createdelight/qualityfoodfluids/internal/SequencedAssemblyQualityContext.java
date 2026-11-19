@@ -112,12 +112,7 @@ public final class SequencedAssemblyQualityContext {
                 state.hasQualitySource
         );
 
-        ItemStack result = stack;
-        if (Utils.isValidItem(result)) {
-            result = quality.level() > 0
-                    ? QualityFoodFluidsApi.applyItemQuality(result, quality)
-                    : QualityFoodFluidsApi.clearItemQuality(result);
-        }
+        ItemStack result = QualityFoodFluidsCreateRules.applyItemOutputQuality(quality, stack);
 
         if (clearInternal) {
             clearInternalTag(result);
