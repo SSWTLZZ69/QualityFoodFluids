@@ -28,6 +28,10 @@ public class QualityFoodFluidsMixinPlugin implements IMixinConfigPlugin {
             return isLoaded("jei");
         }
 
+        if (mixinClassName.endsWith("JadeFluidStorageProviderMixin")) {
+            return isLoaded("jade");
+        }
+
         if (mixinClassName.endsWith("BrewinKegBlockEntityMixin")) {
             return isLoaded("brewinandchewin");
         }
