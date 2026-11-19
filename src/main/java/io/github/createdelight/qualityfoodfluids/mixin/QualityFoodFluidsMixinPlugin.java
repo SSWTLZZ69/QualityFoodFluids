@@ -20,6 +20,14 @@ public class QualityFoodFluidsMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.endsWith("CgtJeiPluginMixin")) {
+            return isLoaded("jei") && isLoaded("creategearsandtavern");
+        }
+
+        if (mixinClassName.endsWith("JeiSubtypeManagerMixin")) {
+            return isLoaded("jei");
+        }
+
         if (mixinClassName.endsWith("BrewinKegBlockEntityMixin")) {
             return isLoaded("brewinandchewin");
         }

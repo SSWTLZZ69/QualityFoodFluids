@@ -28,11 +28,15 @@
     "GenericItemEmptyingMixin",
     "HosePulleyFluidHandlerMixin",
     "ItemStackMixin",
+    "JeiSubtypeManagerMixin",
     "LiquidBlockMixin",
     "OpenEndedPipeMixin",
     "QualityFoodUtilsMixin",
     "RecipeApplierMixin",
     "SequencedAssemblyRecipeMixin"
+  ],
+  "client": [
+    "CgtJeiPluginMixin"
   ],
   "injectors": {
     "defaultRequire": 1
