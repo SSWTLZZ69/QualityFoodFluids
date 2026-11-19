@@ -101,8 +101,9 @@ dependencies {
     compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
     compileOnly(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
     compileOnly(fg.deobf("curse.maven:jade-324717:6855440"))
-    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:15.20.0.132"))
-    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:15.20.0.132"))
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:15.20.0.134"))
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:15.20.0.134"))
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:15.20.0.134"))
 
     compileOnly fg.deobf("curse.maven:brewin-and-chewin-637808:6237884")
     compileOnly fg.deobf("curse.maven:create-diesel-generators-869316:7932785")

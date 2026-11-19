@@ -1,4 +1,4 @@
-# Fluid quality regression
+# Fluid quality and JEI regression
 
 Run from the repository root with Java 17 available to Gradle:
 
@@ -8,7 +8,7 @@ Run from the repository root with Java 17 available to Gradle:
 
 The `gameTest` source set is loaded only by the Forge GameTest server. Its fluids,
 buckets, tags, and empty structure are excluded from the published mod JAR.
-Tests use real Forge capabilities and the common QFF Mixins.
+Tests use real Forge capabilities, JEI 15.20.0.134, and the common QFF Mixins.
 The development runtime also supplies Create and optional storage integrations;
 the tests do not require an integration pack or its scripts. These development
 dependencies remain optional for the shipped mod.
@@ -30,6 +30,10 @@ The tests cover:
   fluid quality survives both transfer directions, but QF item quality is rejected.
 - Stale outer QF tags are cleared on processing without changing stored fluids or
   native data; normal fluid never inherits another tank's grade.
+- Real JEI subtype registration and native interpreters: four distinct Ingredient
+  IDs, one Recipe ID across quality grades, with native aging preserved.
+- Recipe-lookup copies remove quality from item tags, nested fluid NBT, and
+  serialized ForgeCaps without changing the actual item or its stored fluid.
 - When Fluid Logistics is loaded, its real copper bucket is filled and emptied
   through Forge for all four grades, without receiving an outer QF item tag.
 

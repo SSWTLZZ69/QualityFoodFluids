@@ -13,6 +13,7 @@ import mezz.jei.api.ingredients.subtypes.UidContext;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -40,12 +41,10 @@ public class QualityFoodFluidsJeiPlugin implements IModPlugin {
         for (Item item : ForgeRegistries.ITEMS) {
             ItemStack stack = item.getDefaultInstance();
 
-            if (item instanceof BucketItem || stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
-                try {
-                    registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, this::itemSubtype);
-                } catch (IllegalArgumentException ignored) {
-                    // Another JEI plugin already handles this item subtype.
-                }
+            if (QualityFoodFluidsApi.isAutomaticallyQualityCapableItem(stack)
+                    || item instanceof BucketItem
+                    || stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
+                registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, this::itemSubtype);
             }
         }
     }
@@ -57,11 +56,9 @@ public class QualityFoodFluidsJeiPlugin implements IModPlugin {
                 continue;
             }
 
-            try {
-                registration.registerSubtypeInterpreter(ForgeTypes.FLUID_STACK, fluid, this::fluidSubtype);
-            } catch (IllegalArgumentException ignored) {
-                // Another JEI plugin already handles this fluid subtype.
-            }
+            // JEI keeps any interpreter registered by an earlier plugin. The
+            // subtype-manager hook adds quality to that native result as well.
+            registration.registerSubtypeInterpreter(ForgeTypes.FLUID_STACK, fluid, this::fluidSubtype);
         }
     }
 
@@ -84,6 +81,10 @@ public class QualityFoodFluidsJeiPlugin implements IModPlugin {
     }
 
     private String itemSubtype(ItemStack stack, UidContext context) {
+        if (context == UidContext.Recipe) {
+            return IIngredientSubtypeInterpreter.NONE;
+        }
+
         Quality itemQuality = QualityFoodFluidsApi.getItemQuality(stack);
         FluidStack fluid = containedFluid(stack);
         Quality fluidQuality = QualityFoodFluidsApi.getQuality(fluid);
@@ -99,12 +100,29 @@ public class QualityFoodFluidsJeiPlugin implements IModPlugin {
 
     private String fluidSubtype(FluidStack stack, UidContext context) {
         Quality quality = QualityFoodFluidsApi.getQuality(stack);
+        CompoundTag nativeTag = QualityFoodFluidsApi.clearQuality(stack).getTag();
+        String nativeSubtype = nativeFluidSubtype(ForgeRegistries.FLUIDS.getKey(stack.getFluid()), nativeTag);
 
-        if (quality.level() <= 0) {
+        if (context == UidContext.Recipe || quality.level() <= 0) {
+            return nativeSubtype.isEmpty() ? IIngredientSubtypeInterpreter.NONE : nativeSubtype;
+        }
+
+        String subtype = "quality_food_fluids:quality=" + quality.level();
+        return nativeSubtype.isEmpty() ? subtype : subtype + ";" + nativeSubtype;
+    }
+
+    static String nativeFluidSubtype(ResourceLocation fluidId, CompoundTag tag) {
+        if (tag == null || tag.isEmpty()) {
             return IIngredientSubtypeInterpreter.NONE;
         }
 
-        return "quality_food_fluids:quality=" + quality.level();
+        CompoundTag nativeTag = tag.copy();
+        if (fluidId != null && "creategearsandtavern".equals(fluidId.getNamespace())) {
+            // CGT has one fluid ID per drink. Its own JEI interpreter also
+            // ignores brewing levels; retain the actual NBT on recipe stacks.
+            nativeTag.remove("DrinkVariant");
+        }
+        return nativeTag.isEmpty() ? IIngredientSubtypeInterpreter.NONE : "native=" + nativeTag;
     }
 
     private static FluidStack containedFluid(ItemStack stack) {
