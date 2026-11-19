@@ -27,6 +27,13 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+sourceSets {
+    gameTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
     copyIdeResources = true
@@ -57,6 +64,11 @@ minecraft {
 
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
+            mods {
+                "${mod_id}" {
+                    source sourceSets.gameTest
+                }
+            }
         }
 
         data {
@@ -96,6 +108,20 @@ dependencies {
     compileOnly fg.deobf("curse.maven:create-diesel-generators-869316:7932785")
     compileOnly fg.deobf("curse.maven:farmers-respite-551453:5543547")
     compileOnly fg.deobf("curse.maven:create-fluidlogistics-1475079:8812597")
+
+    // Optional integrations for the development client. These are not bundled
+    // in QFF's JAR and do not add mandatory entries to mods.toml.
+    runtimeOnly(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
+    runtimeOnly(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
+    runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
+    runtimeOnly(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
+    runtimeOnly(fg.deobf("curse.maven:jade-324717:6855440"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:15.20.0.134"))
+    runtimeOnly fg.deobf("curse.maven:create-fluidlogistics-1475079:9340856")
+    runtimeOnly fg.deobf("curse.maven:sophisticated-backpacks-422301:8503063")
+    runtimeOnly fg.deobf("curse.maven:sophisticated-core-618298:8503031")
+    runtimeOnly fg.deobf("curse.maven:functionalstorage-556861:8412552")
+    runtimeOnly fg.deobf("curse.maven:titanium-287342:8426836")
 
     compileOnly "org.spongepowered:mixin:0.8.5"
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
