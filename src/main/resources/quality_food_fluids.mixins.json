@@ -36,7 +36,8 @@
     "SequencedAssemblyRecipeMixin"
   ],
   "client": [
-    "CgtJeiPluginMixin"
+    "CgtJeiPluginMixin",
+    "JadeFluidStorageProviderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

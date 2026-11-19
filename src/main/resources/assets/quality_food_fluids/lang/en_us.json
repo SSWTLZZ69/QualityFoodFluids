@@ -1,11 +1,10 @@
 {
   "modmenu.nameTranslation.quality_food_fluids": "Quality Food Fluids",
-  "tooltip.quality_food_fluids.fluid_quality": "Fluid Quality: ",
-  "tooltip.quality_food_fluids.storage_fluid_quality": "%s Quality: %s",
   "quality_type.quality_food_fluids.none": "Normal",
   "quality_type.quality_food_fluids.iron": "Iron",
   "quality_type.quality_food_fluids.gold": "Gold",
   "quality_type.quality_food_fluids.diamond": "Diamond",
   "fluid.quality_food_fluids.with_quality": "%1$s %2$s",
+  "config.jade.plugin_quality_food_fluids.world_fluid_quality": "World Fluid Quality Prefix",
   "jei.info.quality_food_fluids.quality_fluid": "This fluid can carry Quality Food quality. The actual quality is stored on the fluid stack, its container item, or the placed world fluid, and basin processing rolls and locks it when processing starts."
 }
