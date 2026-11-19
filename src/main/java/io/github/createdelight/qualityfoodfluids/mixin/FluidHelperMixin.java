@@ -23,7 +23,9 @@ public abstract class FluidHelperMixin {
             at = @At("HEAD")
     )
     private static void qualityFoodFluids$captureExchangeItemQuality(IFluidHandler tank, IFluidHandlerItem item, FluidExchange forcedDirection, boolean singleTank, int maxAmount, CallbackInfoReturnable<FluidExchange> callback) {
-        QUALITY_FOOD_FLUIDS$EXCHANGE_ITEM_QUALITY.set(QualityFoodFluidsApi.getContainedFluidQuality(item));
+        Quality quality = item != null && QualityFoodFluidsApi.isAutomaticallyQualityCapableItem(item.getContainer())
+                ? QualityFoodFluidsApi.getContainedFluidQuality(item) : Quality.NONE;
+        QUALITY_FOOD_FLUIDS$EXCHANGE_ITEM_QUALITY.set(quality);
     }
 
     @ModifyArg(

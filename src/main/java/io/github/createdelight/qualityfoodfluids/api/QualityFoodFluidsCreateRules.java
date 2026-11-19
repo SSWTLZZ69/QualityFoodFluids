@@ -30,7 +30,7 @@ public final class QualityFoodFluidsCreateRules {
 
     public static ItemStack applyFillingQuality(Quality quality, ItemStack result) {
         if (result.isEmpty() || !Utils.isValidItem(result)) {
-            return result;
+            return QualityFoodFluidsApi.clearItemQuality(result);
         }
 
         return quality.level() > 0 ? QualityFoodFluidsApi.applyItemQuality(result, quality) : result;
@@ -78,7 +78,7 @@ public final class QualityFoodFluidsCreateRules {
         }
 
         if (output.isEmpty() || !Utils.isValidItem(output)) {
-            return output;
+            return QualityFoodFluidsApi.clearItemQuality(output);
         }
 
         return quality.level() > 0

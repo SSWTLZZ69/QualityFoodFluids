@@ -2,6 +2,7 @@ package io.github.createdelight.qualityfoodfluids.api;
 
 import de.cadentem.quality_food.core.Quality;
 import de.cadentem.quality_food.util.QualityUtils;
+import de.cadentem.quality_food.util.Utils;
 import io.github.createdelight.qualityfoodfluids.registry.QualityFoodFluidTags;
 import io.github.createdelight.qualityfoodfluids.world.WorldFluidQualityData;
 import net.minecraft.core.BlockPos;
@@ -109,24 +110,10 @@ public final class QualityFoodFluidsApi {
             return true;
         }
 
-        if (stack.getItem() instanceof BucketItem bucket
-                && canCarryQuality(new FluidStack(bucket.getFluid(), 1000))) {
-            return true;
-        }
-
-        IFluidHandlerItem handler = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve().orElse(null);
-
-        if (handler == null) {
-            return false;
-        }
-
-        for (int tank = 0; tank < handler.getTanks(); tank++) {
-            if (canCarryQuality(handler.getFluidInTank(tank))) {
-                return true;
-            }
-        }
-
-        return false;
+        // A fluid capability describes stored contents. Backpacks, drawers,
+        // and reusable transfer tools must not become QF-quality items.
+        return stack.getItem() instanceof BucketItem bucket
+                && canCarryQuality(new FluidStack(bucket.getFluid(), 1000));
     }
 
     public static Quality getItemQuality(ItemStack stack) {
@@ -155,7 +142,8 @@ public final class QualityFoodFluidsApi {
             }
         }
 
-        return getItemQuality(handler.getContainer());
+        ItemStack container = handler.getContainer();
+        return isAutomaticallyQualityCapableItem(container) ? getItemQuality(container) : Quality.NONE;
     }
 
     public static Quality getItemOrContainedFluidQuality(ItemStack stack) {
@@ -165,14 +153,14 @@ public final class QualityFoodFluidsApi {
             return quality;
         }
 
-        return getItemQuality(stack);
+        return Utils.isValidItem(stack) ? getItemQuality(stack) : Quality.NONE;
     }
 
     public static ItemStack applyItemQuality(ItemStack stack, Quality quality) {
-        ItemStack copy = stack.copy();
+        ItemStack copy = clearItemQuality(stack);
 
-        if (copy.isEmpty() || quality == null || quality.level() <= 0) {
-            return clearItemQuality(copy);
+        if (copy.isEmpty() || quality == null || quality.level() <= 0 || !Utils.isValidItem(copy)) {
+            return copy;
         }
 
         QualityUtils.applyQuality(copy, quality, true);
@@ -200,7 +188,7 @@ public final class QualityFoodFluidsApi {
     public static FluidStack copyContainerQualityToFluid(ItemStack source, FluidStack fluid) {
         Quality quality = getQuality(fluid);
 
-        if (quality.level() > 0) {
+        if (quality.level() > 0 || !isAutomaticallyQualityCapableItem(source)) {
             return withQuality(fluid, quality);
         }
 
@@ -216,7 +204,7 @@ public final class QualityFoodFluidsApi {
     public static FluidStack copyContainerQualityToFluid(IFluidHandlerItem source, FluidStack fluid) {
         Quality quality = getQuality(fluid);
 
-        if (quality.level() > 0) {
+        if (quality.level() > 0 || source == null || !isAutomaticallyQualityCapableItem(source.getContainer())) {
             return withQuality(fluid, quality);
         }
 
