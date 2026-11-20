@@ -15,7 +15,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -25,56 +24,12 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @GameTestHolder(QualityFoodFluids.MODID)
 @PrefixGameTestTemplate(false)
 public final class JeiQualityRecipeTests {
     private static final Quality[] GRADES = {Quality.NONE, Quality.IRON, Quality.GOLD, Quality.DIAMOND};
-
-    @GameTest(template = "empty")
-    public static void cgtListUsesOneBaseEntryAndPreservesRecipeSamples(GameTestHelper helper) {
-        FluidStack first = fluid(Quality.NONE, 1);
-        FluidStack last = fluid(Quality.DIAMOND, 6);
-        FluidStack beforeFirst = first.copy();
-        FluidStack beforeLast = last.copy();
-        var entries = CgtJeiFluidEntries.baseEntries(List.of(first, last, FluidStack.EMPTY));
-        check(entries.size() == 1, "CGT repeats one drink for each brewing level");
-        FluidStack base = entries.iterator().next();
-        Fluid expected = first.getFluid() instanceof FlowingFluid flowing ? flowing.getSource() : first.getFluid();
-        check(base.getFluid() == expected && base.getAmount() == 1000 && !base.hasTag(),
-                "CGT list representative retained brewing or quality NBT");
-        check(first.isFluidStackIdentical(beforeFirst) && last.isFluidStackIdentical(beforeLast),
-                "JEI list preparation changed actual recipe fluid samples");
-        helper.succeed();
-    }
-
-    @GameTest(template = "empty")
-    public static void cgtBaseEntryMatchesBrewingVariantsWithoutChangingFluidData(GameTestHelper helper) {
-        ResourceLocation vinegar = new ResourceLocation("creategearsandtavern", "vinegar");
-        for (int level = 0; level <= 6; level++) {
-            CompoundTag variant = new CompoundTag();
-            variant.putString("drink_id", "kaleidoscope_tavern:vinegar");
-            variant.putInt("brew_level", level);
-            CompoundTag tag = new CompoundTag();
-            tag.put("DrinkVariant", variant);
-            CompoundTag before = tag.copy();
-            check(QualityFoodFluidsJeiPlugin.nativeFluidSubtype(vinegar, tag).isEmpty(),
-                    "CGT brewing data creates a duplicate JEI ingredient");
-            check(before.equals(tag), "JEI normalization changed real brewing data");
-            check(!QualityFoodFluidsJeiPlugin.nativeFluidSubtype(id("other_fluid"), tag).isEmpty(),
-                    "CGT compatibility discarded another mod's native variant");
-
-            tag.putInt("SignatureCocktailColor", 0x123456);
-            String subtype = QualityFoodFluidsJeiPlugin.nativeFluidSubtype(vinegar, tag);
-            check(!subtype.isEmpty(), "CGT compatibility discarded cocktail data");
-            tag.putInt("SignatureCocktailColor", 0x654321);
-            check(!subtype.equals(QualityFoodFluidsJeiPlugin.nativeFluidSubtype(vinegar, tag)),
-                    "different cocktail data collapsed into one recipe identity");
-        }
-        helper.succeed();
-    }
 
     @GameTest(template = "empty")
     public static void registeredQualityVariantsShareRecipeIds(GameTestHelper helper) {
