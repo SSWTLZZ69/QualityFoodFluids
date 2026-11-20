@@ -37,6 +37,7 @@
   ],
   "client": [
     "CgtJeiPluginMixin",
+    "CgtJeiDrinkRecipesMixin",
     "JadeFluidStorageProviderMixin"
   ],
   "injectors": {
