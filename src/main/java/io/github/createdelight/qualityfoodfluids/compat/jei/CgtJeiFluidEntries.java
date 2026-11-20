@@ -2,15 +2,42 @@ package io.github.createdelight.qualityfoodfluids.compat.jei;
 
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
 
 public final class CgtJeiFluidEntries {
     private CgtJeiFluidEntries() {
+    }
+
+    public static List<ItemStack> baseBottleSamples(List<ItemStack> variants) {
+        Map<Item, ItemStack> entries = new LinkedHashMap<>();
+        for (ItemStack stack : variants) {
+            if (!stack.isEmpty()) {
+                // These bottles only feed CGT's synthetic JEI recipes. Avoid
+                // copying brewing levels, stored effects, or quality into them.
+                entries.computeIfAbsent(stack.getItem(), ItemStack::new);
+            }
+        }
+        return new ArrayList<>(entries.values());
+    }
+
+    public static FluidStack baseRecipeFluid(FluidStack stack) {
+        return stack.isEmpty() ? FluidStack.EMPTY : new FluidStack(stack.getFluid(), stack.getAmount());
+    }
+
+    public static FluidStack[] baseRecipeOutputs(FluidStack[] variants) {
+        FluidStack[] outputs = new FluidStack[variants.length];
+        for (int i = 0; i < variants.length; i++) {
+            outputs[i] = baseRecipeFluid(variants[i]);
+        }
+        return outputs;
     }
 
     public static Collection<FluidStack> baseEntries(Collection<FluidStack> variants) {
