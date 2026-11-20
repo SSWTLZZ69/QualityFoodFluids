@@ -101,7 +101,7 @@ public class QualityFoodFluidsJeiPlugin implements IModPlugin {
     private String fluidSubtype(FluidStack stack, UidContext context) {
         Quality quality = QualityFoodFluidsApi.getQuality(stack);
         CompoundTag nativeTag = QualityFoodFluidsApi.clearQuality(stack).getTag();
-        String nativeSubtype = nativeFluidSubtype(ForgeRegistries.FLUIDS.getKey(stack.getFluid()), nativeTag);
+        String nativeSubtype = nativeTag == null || nativeTag.isEmpty() ? "" : "native=" + nativeTag;
 
         if (context == UidContext.Recipe || quality.level() <= 0) {
             return nativeSubtype.isEmpty() ? IIngredientSubtypeInterpreter.NONE : nativeSubtype;
@@ -109,20 +109,6 @@ public class QualityFoodFluidsJeiPlugin implements IModPlugin {
 
         String subtype = "quality_food_fluids:quality=" + quality.level();
         return nativeSubtype.isEmpty() ? subtype : subtype + ";" + nativeSubtype;
-    }
-
-    static String nativeFluidSubtype(ResourceLocation fluidId, CompoundTag tag) {
-        if (tag == null || tag.isEmpty()) {
-            return IIngredientSubtypeInterpreter.NONE;
-        }
-
-        CompoundTag nativeTag = tag.copy();
-        if (fluidId != null && "creategearsandtavern".equals(fluidId.getNamespace())) {
-            // CGT has one fluid ID per drink. Its own JEI interpreter also
-            // ignores brewing levels; retain the actual NBT on recipe stacks.
-            nativeTag.remove("DrinkVariant");
-        }
-        return nativeTag.isEmpty() ? IIngredientSubtypeInterpreter.NONE : "native=" + nativeTag;
     }
 
     private static FluidStack containedFluid(ItemStack stack) {

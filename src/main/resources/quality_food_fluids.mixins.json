@@ -36,8 +36,6 @@
     "SequencedAssemblyRecipeMixin"
   ],
   "client": [
-    "CgtJeiPluginMixin",
-    "CgtJeiDrinkRecipesMixin",
     "JadeFluidStorageProviderMixin"
   ],
   "injectors": {

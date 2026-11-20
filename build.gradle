@@ -64,7 +64,6 @@ minecraft {
 
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
-            args '--mixin.config=quality_food_fluids.cgt_recipe_test.mixins.json'
             mods {
                 "${mod_id}" {
                     source sourceSets.gameTest
